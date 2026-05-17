@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROLETA 777 S.S | PREMIUM EDITION</title>
+    <!-- Importação de fontes refinada - Montserrat e Cinzel para o Cassino -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght=700;900&family=Montserrat:wght=300;400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --gold-glow: #f1c40f;
+            --gold-dark: #8a6d3b; 
+            --dark-bg: #050505;
+            --red-casino: #b30000;
+            --neon-green: #00ff88;
+            --glass: rgba(255, 255, 255, 0.03);
+            --gold-linear: linear-gradient(145deg, #bd9539, #ffeb99, #8a6d3b);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body { background: var(--dark-bg); color: #fff; min-height: 100vh; overflow-x: hidden; }
+
+        /* Fontes temáticas do cassino aplicadas em títulos específicos */
+        .casino-font { font-family: 'Cinzel', serif !important; }
+
+        /* --- FUNDO ANIMADO (CANVAS) --- */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; 
+            background: radial-gradient(circle at center, #111 0%, #000 100%);
+            pointer-events: none; 
+        }
+
+        /* --- TELA DE ACESSO --- */
+        #auth-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 5000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: opacity 1s ease;
+        }
+
+        .login-box {
+            position: relative;
+            z-index: 5001;
+            width: 100%;
+            max-width: 400px;
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            border-radius: 28px;
+            padding: 40px 30px;
+            backdrop-filter: blur(25px);
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,1), 0 0 20px rgba(212, 175, 55, 0.1);
+        }
+
+        .logo-main { 
+            font-weight: 900; 
+            font-size: 1.8rem; 
+            letter-spacing: 4px; 
+            text-transform: uppercase; 
+            background: linear-gradient(180deg, #fff 30%, var(--gold) 100%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2px;
+        }
+
+        .logo-sub { 
+            font-size: 0.6rem; 
+            font-weight: 600; 
+            letter-spacing: 5px; 
+            color: var(--gold); 
+            text-transform: uppercase; 
+            opacity: 0.9;
+        }
+
+        .auth-tabs { display: flex; gap: 15px; margin: 30px 0; justify-content: center; }
+        .auth-tab { font-weight: 800; font-size: 0.75rem; cursor: pointer; transition: 0.3s; text-transform: uppercase; color: #444; letter-spacing: 1px; border-bottom: 2px solid transparent; }
+        .auth-tab.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
+        .auth-form { display: none; }
+        .auth-form.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .input-group { text-align: left; margin-bottom: 20px; }
+        .input-group label { font-size: 0.6rem; font-weight: 800; color: var(--gold); display: block; margin-bottom: 8px; letter-spacing: 1.5px; }
+        .input-group input { width: 100%; padding: 16px; background: rgba(0,0,0,0.5); border: 1px solid #222; border-radius: 12px; color: #fff; outline: none; transition: 0.3s; }
+
+        .btn-login {
+            width: 100%; padding: 20px; background: linear-gradient(135deg, #d4af37, #f1c40f);
+            border: none; border-radius: 14px; color: #000; font-weight: 900; cursor: pointer;
+            text-transform: uppercase; margin-top: 10px; font-size: 0.85rem; letter-spacing: 1px;
+        }
+
+        /* --- NOTIFICAÇÕES DE AUTENTICAÇÃO VIP --- */
+        .auth-toast-container {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            z-index: 6000;
+            pointer-events: none;
+        }
+        .auth-toast {
+            background: rgba(10, 10, 10, 0.95);
+            border-radius: 14px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .auth-toast.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .auth-toast-title {
+            font-size: 0.65rem;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .auth-toast-desc {
+            font-size: 0.7rem;
+            color: #ccc;
+            font-weight: 500;
+        }
+
+        #main-content { position: relative; z-index: 10; } 
+        header { padding: 25px 15px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); background: rgba(0,0,0,0.8); text-align: center; backdrop-filter: blur(10px); position: relative; }
+        
+        /* BOTÃO DE PERFIL VIP SUPERIOR */
+        .profile-trigger {
+            position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+            background: rgba(212, 175, 55, 0.08); border: 1px solid rgba(212, 175, 55, 0.4);
+            border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center;
+            justify-content: center; cursor: pointer; transition: 0.3s;
+        }
+        .profile-trigger:hover { background: rgba(212, 175, 55, 0.2); box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
+        .profile-trigger svg { fill: var(--gold); width: 20px; height: 20px; }
+
+        .section-header { text-align: left; margin-bottom: 20px; border-left: 3px solid var(--gold); padding-left: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .section-header h2 { font-size: 1.2rem; font-weight: 900; color: #fff; text-transform: uppercase; }
+        .section-header p { font-size: 0.7rem; color: #888; margin-top: 5px; }
+        
+        /* BOTÃO DE INSTRUÇÃO NOVO */
+        .info-trigger-btn {
+            background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold);
+            color: var(--gold); width: 28px; height: 28px; border-radius: 50%;
+            font-weight: 900; font-size: 0.85rem; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; transition: 0.3s;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); margin-right: 10px;
+        }
+        .info-trigger-btn:hover { background: var(--gold); color: #000; }
+
+        .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 400px; }
+        .toast { background: rgba(15, 15, 15, 0.95); border: 1px solid var(--gold); color: #fff; padding: 15px 20px; border-radius: 12px; margin-bottom: 10px; animation: toastIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
+        
+        nav { display: flex; justify-content: center; gap: 4px; padding: 12px; background: rgba(0,0,0,0.5); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); width: 100%; overflow-x: auto; }
+        nav button { background: none; border: 1px solid transparent; color: #666; padding: 8px 10px; border-radius: 20px; font-weight: 700; font-size: 0.62rem; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+        nav button.active { color: var(--gold); border-color: var(--gold); background: rgba(212,175,55,0.1); }
+        
+        .tab-content { display: none; padding: 20px; max-width: 450px; margin: 0 auto; text-align: center; }
+        .tab-content.active { display: block; }
+
+        /* --- CARD DE SALDO --- */
+        .balance-card { 
+            background: linear-gradient(135deg, rgba(20,20,20,0.9), rgba(0,0,0,1)); 
+            padding: 20px; 
+            border-radius: 24px; 
+            border: 1px solid rgba(212, 175, 55, 0.3); 
+            margin-bottom: 20px; 
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: 0.3s;
+        }
+
+        .balance-card::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
+            animation: pulseGlow 4s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        .balance-label { font-size: 0.6rem; color: var(--gold); font-weight: 900; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 5px; text-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
+        .balance-amount { font-size: 2.2rem; font-weight: 900; color: #fff; display: block; background: linear-gradient(to bottom, #fff, var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.3)); }
+
+        /* --- ROLETA PREMIUM CUSTOMIZADA --- */
+        .wheel-outer { 
+            width: 320px; height: 320px; margin: 15px auto; position: relative; padding: 14px; border-radius: 50%; 
+            background: radial-gradient(circle, #2d2410 0%, #0d0a04 70%, #020202 100%); 
+            box-shadow: 0 35px 70px rgba(0,0,0,0.9), inset 0 0 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(212, 175, 55, 0.15);
+            border: 2px solid #4a3b1a;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .wheel-outer::before {
+            content: '';
+            position: absolute;
+            top: 6px; left: 6px; right: 6px; bottom: 6px;
+            border-radius: 50%;
+            border: 2px dashed rgba(212, 175, 55, 0.3);
+            box-shadow: inset 0 0 20px rgba(212, 175, 55, 0.2);
+            animation: pulseLights 2.5s infinite linear;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        @keyframes pulseLights {
+            0%, 100% { opacity: 0.4; filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.3)); }
+            50% { opacity: 0.9; filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.7)); }
+        }
+
+        .wheel-container { width: 100%; height: 100%; border-radius: 50%; border: 6px solid #141414; position: relative; overflow: hidden; background: #050505; box-shadow: inset 0 0 25px rgba(0,0,0,0.9); }
+        .wheel-container::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 50%, rgba(0,0,0,0.6) 100%); pointer-events: none; z-index: 6; }
+        
+        #wheel-wrapper { 
+            width: 100%; 
+            height: 100%; 
+            transition: transform 8s cubic-bezier(0.15, 0, 0.15, 1) !important; 
+            will-change: transform;
+        }
+        
+        .wheel-img { 
+            width: 100%; height: 100%; border-radius: 50%; 
+            background: conic-gradient(
+                #0b0c10 0deg 18deg, #9a7b2c 18deg 36deg, 
+                #0b0c10 36deg 54deg, #9a7b2c 54deg 72deg, 
+                #0b0c10 72deg 90deg, #9a7b2c 90deg 108deg, 
+                #0b0c10 108deg 126deg, #9a7b2c 126deg 144deg, 
+                #0b0c10 144deg 162deg, #9a7b2c 162deg 180deg, 
+                #0b0c10 180deg 198deg, #9a7b2c 198deg 216deg, 
+                #0b0c10 216deg 234deg, #9a7b2c 234deg 252deg, 
+                #0b0c10 252deg 270deg, #9a7b2c 270deg 288deg, 
+                #0b0c10 288deg 306deg, #9a7b2c 306deg 324deg, 
+                #0b0c10 324deg 342deg, #9a7b2c 342deg 360deg
+            ); 
+            box-shadow: inset 0 0 80px rgba(0,0,0,0.95);
+            border: 1px solid rgba(212, 175, 55, 0.08);
+        }
+
+        .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 68px; height: 68px; border-radius: 50%; border: 2px solid #3a301a; background: radial-gradient(circle, #221a0f 0%, #070707 100%); z-index: 10; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,0,0,0.9), inset 0 0 10px rgba(212, 175, 55, 0.1); }
+        .wheel-center span { font-weight: 300; background: var(--gold-linear); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.2rem; filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.3)); }
+        .pointer { position: absolute; top: -5px; left: 50%; transform: translateX(-50%); width: 4px; height: 35px; background: var(--gold-linear); z-index: 20; border-radius: 2px; box-shadow: 0 0 8px rgba(212, 175, 55, 0.6); }
+        
+        /* MODAL DE INSTRUÇÕES */
+        .instructions-popup {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+            z-index: 10000; display: none; align-items: center; justify-content: center;
+        }
+        .instructions-box {
+            background: rgba(15, 15, 15, 0.95); border: 1px solid var(--gold);
+            border-radius: 18px; padding: 20px; width: 90%; max-width: 320px;
+            text-align: left; box-shadow: 0 15px 40px rgba(0,0,0,0.8); position: relative;
+        }
+        .instructions-box h4 { font-size: 0.75rem; color: var(--gold); font-weight: 900; letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase; }
+        .instructions-box p { font-size: 0.68rem; color: #ccc; line-height: 1.4; font-weight: 400; }
+        .instructions-close {
+            position: absolute; top: 12px; right: 15px; color: #666; font-size: 0.85rem;
+            font-weight: 800; cursor: pointer; transition: 0.2s;
+        }
+        .instructions-close:hover { color: #fff; }
+
+        .color-buttons { display: flex; justify-content: center; gap: 12px; margin: 20px 0; }
+        .color-btn { width: 140px; height: 55px; border-radius: 8px; cursor: pointer; font-weight: 900; letter-spacing: 1px; font-size: 0.6rem; text-transform: uppercase; border: 1px solid #222; transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
+        .btn-black { background: #0a0a0a; color: #555; } 
+        .btn-red { background: #0f0f0f; color: #555; }
+        .color-btn.selected { border-color: var(--gold); color: #fff; transform: translateY(-2px); box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); }
+        
+        .bet-controls { background: rgba(255,255,255,0.01); padding: 15px; border-radius: 12px; border: 1px solid #111; }
+        .bet-input { background: #000; border: 1px solid #222; color: var(--gold); padding: 12px; width: 110px; border-radius: 8px; font-weight: 900; text-align: center; outline: none; }
+        .m-btn { background: #0a0a0a; border: 1px solid #222; color: #444; width: 42px; height: 42px; border-radius: 6px; cursor: pointer; font-weight: 900; }
+        .m-btn.active { background: #111; color: var(--gold); border-color: var(--gold); }
+        
+        /* BOTÃO DE INICIAR OPERAÇÃO */
+        .spin-master { 
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(5, 5, 5, 1)); 
+            color: var(--gold); 
+            border: 1px solid rgba(212, 175, 55, 0.5); 
+            padding: 14px 0; 
+            width: 85%; 
+            max-width: 280px;
+            border-radius: 30px; 
+            font-weight: 900; 
+            margin: 20px auto 0 auto; 
+            text-transform: uppercase; 
+            cursor: pointer; 
+            letter-spacing: 2px; 
+            font-size: 0.72rem;
+            display: block;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        .spin-master::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: 0.6s;
+        }
+        .spin-master:hover:not(:disabled)::before {
+            transform: translateX(100%);
+        }
+        .spin-master:hover:not(:disabled) { 
+            border-color: var(--gold-glow);
+            color: #fff;
+            box-shadow: 0 0 18px rgba(212, 175, 55, 0.35), 0 8px 25px rgba(0,0,0,0.8); 
+            transform: translateY(-2px);
+        }
+        .spin-master:active:not(:disabled) {
+            transform: translateY(1px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .spin-master:disabled { 
+            opacity: 0.15; 
+            filter: grayscale(1); 
+            border-color: #222; 
+            color: #444; 
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .custom-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; z-index: 2000; justify-content: center; align-items: center; }
+        .modal-box { background: #111; border: 1px solid var(--gold); padding: 25px; border-radius: 24px; width: 90%; max-width: 400px; }
+
+        /* CARDS DO MODAL DE PERFIL */
+        .profile-card-item { background: rgba(0, 0, 0, 0.4); border: 1px solid #222; padding: 12px; border-radius: 10px; margin-bottom: 10px; text-align: left; }
+        .profile-card-item span { font-size: 0.55rem; color: var(--gold); font-weight: 800; display: block; letter-spacing: 1px; }
+        .profile-card-item p { font-size: 0.8rem; color: #fff; font-weight: 600; margin-top: 2px; }
+        .profile-card-item input { width: 100%; background: transparent; border: none; outline: none; font-size: 0.8rem; color: #fff; font-weight: 600; margin-top: 2px; padding: 2px 0; }
+        .profile-card-item input.gold-status { color: var(--gold-glow); font-weight: 800; text-transform: uppercase; }
+
+        /* NOTIFICAÇÃO DE VITÓRIA PREMIUM */
+        #win-overlay { 
+            position: fixed; 
+            top: 20px; 
+            right: -320px; 
+            width: 260px; 
+            background: radial-gradient(circle at top left, #1a160b 0%, #0a0a0a 100%); 
+            display: flex; 
+            z-index: 9999; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--gold);
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 30px rgba(212, 175, 55, 0.15);
+            transition: right 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none; 
+        }
+        #win-overlay.active {
+            right: 20px; 
+        }
+        .win-content { text-align: center; width: 100%; }
+        .win-title { color: var(--gold); font-weight: 900; font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 2px; }
+        #win-amt-display { 
+            font-size: 2rem; 
+            font-weight: 900; 
+            background: linear-gradient(180deg, #fff 0%, #d4af37 50%, #8a6d3b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.4));
+            margin: 2px 0;
+        }
+
+        /* AJUSTES DE BELEZA - GRADE DE STATUS DA ROLETA */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 25px 0 15px 0; padding: 0 5px; }
+        .stats-item { background: linear-gradient(135deg, rgba(15,15,15,0.9), rgba(5,5,5,1)); padding: 14px 10px; border-radius: 14px; font-size: 0.65rem; border: 1px solid rgba(212, 175, 55, 0.15); box-shadow: 0 5px 15px rgba(0,0,0,0.4); text-transform: uppercase; }
+        .stat-item b { color: var(--gold); font-weight: 900; display: block; margin-bottom: 4px; font-size: 0.55rem; letter-spacing: 0.5px; }
+        .stat-item span { font-weight: 800; font-size: 0.85rem; color: #fff; }
+
+        /* --- ESTILIZAÇÃO DO RELATÓRIO DE ATIVIDADES MELHORADA --- */
+        .notif-list { 
+            background: rgba(10, 10, 10, 0.8); 
+            border-radius: 16px; 
+            padding: 10px; 
+            text-align: left; 
+            margin-top: 15px; 
+            max-height: 210px; 
+            overflow-y: auto; 
+            font-size: 0.7rem; 
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.9);
+        }
+        .notif-item { 
+            padding: 14px 16px; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: rgba(255, 255, 255, 0.01);
+            margin-bottom: 6px;
+            border-radius: 10px;
+            border-left: 3px solid rgba(212, 175, 55, 0.4);
+            transition: 0.2s ease;
+        }
+        .notif-item:hover {
+            background: rgba(212, 175, 55, 0.03);
+            border-left-color: var(--gold-glow);
+        }
+        .notif-item span {
+            font-weight: 600;
+            color: #e0e0e0;
+            letter-spacing: 0.5px;
+        }
+        .notif-item:last-child { margin-bottom: 0; }
+        
+        .pix-option { background: #0a0a0a; border: 1px solid #222; padding: 12px; border-radius: 12px; font-size: 0.7rem; cursor: pointer; color: #444; display: flex; gap: 8px; align-items: center; }
+        .pix-option.active { border-color: var(--gold); color: #fff; background: rgba(212, 175, 55, 0.05); }
+
+        /* RECONSTRUÇÃO COMPLETA DE DESIGN - ABA DO SUPORTE */
+        .support-card {
+            background: linear-gradient(145deg, rgba(20, 20, 20, 0.95), rgba(5, 5, 5, 1));
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            border-radius: 24px;
+            padding: 30px 25px;
+            margin-top: 20px;
+            text-align: left;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7), inset 0 0 15px rgba(212,175,55,0.02);
+            position: relative;
+            overflow: hidden;
+        }
+        .support-info-title {
+            font-size: 0.8rem;
+            color: var(--gold);
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(212,175,55,0.2);
+        }
+        .support-info-text {
+            font-size: 0.72rem;
+            color: #b5b5b5;
+            line-height: 1.6;
+            margin-bottom: 22px;
+            font-weight: 400;
+        }
+        .support-contact-box {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            padding: 18px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.8);
+        }
+        .support-contact-label {
+            font-size: 0.55rem;
+            color: var(--gold);
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
+        .support-contact-value {
+            font-size: 0.9rem;
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* RECONSTRUÇÃO COMPLETA DE DESIGN - CARDS DE BÔNUS SEMANAL */
+        .bonus-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
+        .bonus-card-item {
+            background: linear-gradient(135deg, rgba(15, 15, 15, 0.95), rgba(5, 5, 5, 1));
+            border: 1px solid #1a1a1a;
+            border-radius: 20px;
+            padding: 25px 15px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+        }
+        .bonus-card-item.available {
+            border-color: rgba(212, 175, 55, 0.35);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.08), inset 0 0 10px rgba(212, 175, 55, 0.02);
+            transform: translateY(-2px);
+        }
+        .bonus-day {
+            font-size: 0.65rem;
+            color: #888;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            transition: 0.3s;
+        }
+        .bonus-card-item.available .bonus-day {
+            color: var(--gold);
+            text-shadow: 0 0 8px rgba(212,175,55,0.3);
+        }
+        .bonus-val {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #444;
+            margin-bottom: 15px;
+            transition: 0.3s;
+            font-family: 'Cinzel', serif;
+        }
+        .bonus-card-item.available .bonus-val {
+            color: #fff;
+            background: linear-gradient(to bottom, #fff, #b5b5b5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .bonus-day { font-size: 0.65rem; color: #888; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; transition: 0.3s; }
+        .bonus-card-item.available .bonus-day { color: var(--gold); text-shadow: 0 0 8px rgba(212,175,55,0.3); }
+        .bonus-val { font-size: 1.6rem; font-weight: 900; color: #444; margin-bottom: 15px; transition: 0.3s; font-family: 'Cinzel', serif; }
+        .bonus-card-item.available .bonus-val { color: #fff; background: linear-gradient(to bottom, #fff, #b5b5b5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .bonus-btn {
+            width: 100%;
+            padding: 12px;
+            background: rgba(20,20,20,0.6);
+            border: 1px solid #222;
+            color: #444;
+            font-weight: 800;
+            font-size: 0.65rem;
+            border-radius: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+        .bonus-card-item.available .bonus-btn {
+            background: var(--gold-linear);
+            color: #000;
+            border: none;
+            font-weight: 900;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+        }
+        .bonus-card-item.available .bonus-btn:hover {
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+            transform: scale(1.02);
+        }
+        .bonus-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        @keyframes idleSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .idle-anim { animation: idleSpin 60s linear infinite !important; }
+    </style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- BALÃO DE INSTRUÇÕES POPUP -->
+<div id="instructions-modal" class="instructions-popup">
+    <div class="instructions-box">
+        <span class="instructions-close" onclick="tocarSomBotao(); closeInstructions()">✕</span>
+        <h4>COMO OPERAR NA ARENA</h4>
+        <p>Selecione uma das cores de cobertura (Ônix Absoluto para Preto ou Ouro Imperial para Vermelho). Defina a sua margem base no controle de entrada, apply o multiplicador de alavancagem desejado (1x, 2x ou 3x) e acione o botão para rodar. Acertos liquidam o dobro da aposta.</p>
+    </div>
+</div>
+
+<div id="auth-screen">
+    <div class="login-box">
+        <div class="auth-toast-container">
+            <div id="auth-toast" class="auth-toast">
+                <div id="auth-toast-title" class="auth-toast-title"></div>
+                <div id="auth-toast-desc" class="auth-toast-desc"></div>
+            </div>
+        </div>
+
+        <div class="brand-container">
+            <div class="logo-main casino-font">Roleta 777 S.S</div>
+            <div class="logo-sub">PREMIUM ACCESS</div>
+        </div>
+        <div class="auth-tabs">
+            <div class="auth-tab active" onclick="tocarSomBotao(); switchAuth('login')">Entrar</div>
+            <div class="auth-tab" onclick="tocarSomBotao(); switchAuth('register')">Cadastrar</div>
+        </div>
+        <form id="loginForm" class="auth-form active" onsubmit="realizarLogin(event)">
+            <div class="input-group"><label>E-MAIL</label><input type="email" id="loginEmail" placeholder="Digite seu e-mail" required></div>
+            <div class="input-group"><label>SENHA</label><input type="password" id="loginPassword" placeholder="••••••••" required></div>
+            <button type="submit" class="btn-login" onclick="tocarSomBotao()">ACESSAR ARENA VIP</button>
+        </form>
+        <form id="registerForm" class="auth-form" onsubmit="realizarCadastro(event)">
+            <div class="input-group"><label>NOME COMPLETO</label><input type="text" id="regName" placeholder="Como devemos te chamar?" required></div>
+            <div class="input-group"><label>E-MAIL</label><input type="email" id="regEmail" placeholder="seu@email.com" required></div>
+            <div class="input-group"><label>CRIAR SENHA</label><input type="password" id="regPassword" placeholder="Mínimo 6 caracteres" required></div>
+            <button type="submit" class="btn-login" onclick="tocarSomBotao()">CRIAR CONTA AGORA</button>
+        </form>
+    </div>
+</div>
+
+<div id="main-content" style="display: none;">
+    <div id="toast-container" class="toast-container"></div>
+    
+    <div id="win-overlay">
+        <div class="win-content">
+            <div class="win-title casino-font">OPERAÇÃO BEM-SUCEDIDA</div>
+            <div id="win-amt-display" class="casino-font">R$ 0,00</div>
+        </div>
+    </div>
+
+    <!-- MODAL DE PERFIL DO JOGADOR -->
+    <div id="profile-modal" class="custom-modal">
+        <div class="modal-box" style="max-width: 360px;">
+            <h3 class="casino-font" style="color: var(--gold); font-weight: 900; margin-bottom: 5px;">CONTA VIP</h3>
+            <p style="font-size: 0.65rem; color: #666; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;">Dados Modificáveis de Registro do Operador</p>
+            
+            <div class="profile-card-item">
+                <span>NOME COMPLETO (EDITÁVEL)</span>
+                <input type="text" id="profileName" value="Neymar da Silva Santos">
+            </div>
+            <div class="profile-card-item">
+                <span>PATROCÍNIO / STATUS (EDITÁVEL)</span>
+                <input type="text" class="gold-status" value="MEMBRO BLACK DIAMOND">
+            </div>
+
+            <button onclick="tocarSomBotao(); closeProfileModal()" style="width: 100%; padding: 15px; background: #222; border-radius: 12px; color: #fff; border: none; font-weight: 800; margin-top: 15px; cursor: pointer;">SALVAR E VOLTAR</button>
+        </div>
+    </div>
+
+    <div id="bank-modal" class="custom-modal">
+        <div class="modal-box">
+            <div id="modal-form-area">
+                <h3 id="modal-title" class="casino-font" style="color: var(--gold); font-weight: 900; margin-bottom: 5px;">BANCO</h3>
+                <p id="modal-desc" style="font-size: 0.65rem; color: #666; margin-bottom: 20px;"></p>
+                <div style="text-align:left; margin-bottom:15px;">
+                    <label style="font-size:0.6rem; color:var(--gold); font-weight:900;">VALOR</label>
+                    <input type="number" id="modal-input" placeholder="R$ 0,00" style="width:100%; background:#000; border:1px solid #333; color:#fff; padding:15px; border-radius:12px; margin-top:5px;">
+                    <p id="limit-info" style="font-size: 0.55rem; color: #ff4444; margin-top: 5px; font-weight: 700;"></p>
+                </div>
+                <div id="withdraw-fields" style="display: none; text-align: left;">
+                    <label style="font-size: 0.6rem; color: var(--gold); font-weight: 900; display: block; margin-bottom: 5px;">CHAVE PIX</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+                        <div class="pix-option active" onclick="tocarSomBotao(); selPix('cpf', this)">CPF</div>
+                        <div class="pix-option" onclick="tocarSomBotao(); selPix('email', this)">E-mail</div>
+                    </div>
+                    <input type="text" id="pix-key-input" placeholder="000.000.000-00" style="width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 15px; border-radius: 12px;">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button onclick="tocarSomBotao(); closeBankModal()" style="flex: 1; padding: 15px; background: #222; border-radius: 12px; color: #fff; border: none; font-weight: 800;">VOLTAR</button>
+                    <button id="modal-confirm" style="flex: 1; padding: 15px; background: var(--gold); border-radius: 12px; color: #000; border: none; font-weight: 900;">CONFIRMAR</button>
+                </div>
+            </div>
+            <div id="pix-area" style="display: none; text-align: center;">
+                <h3 class="casino-font" style="color: var(--gold); font-weight: 900;">PAGAMENTO PIX</h3>
+                <p style="font-size: 0.65rem; margin: 10px 0;">Valor: <strong id="pix-val" style="color:var(--neon-green)"></strong></p>
+                <div id="pix-code" style="background:#000; padding:15px; border-radius:10px; font-size:0.5rem; word-break:break-all; border:1px dashed var(--gold); color:var(--gold);">7775c492-6f29-48e1-821e-60d017aa8a38</div>
+                <button onclick="tocarSomBotao(); copyPix()" style="width:100%; padding:15px; background:var(--gold); border:none; border-radius:10px; font-weight:900; margin-top:15px;">COPIAR CHAVE PIX</button>
+                <button onclick="tocarSomBotao(); closeBankModal()" style="margin-top:15px; background:none; border:none; color:#555; text-decoration:underline; font-size:0.6rem;">FECHAR</button>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="brand-container">
+            <div class="logo-main casino-font">Roleta 777 S.S</div>
+            <div class="logo-sub">High Stakes & Exclusive Rewards</div>
+        </div>
+        <div class="profile-trigger" onclick="tocarSomBotao(); openProfileModal()">
+            <svg viewBox="0 0 24 24">
+                <path d="M12,4A4,4 0 0,1 16,8 A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+            </svg>
+        </div>
+    </header>
+
+    <nav>
+        <button id="nav-play" onclick="tocarSomBotao(); openTab('play')" class="active">JOGAR</button>
+        <button id="nav-bonus" onclick="tocarSomBotao(); openTab('bonus')">BÔNUS SEMANAL</button>
+        <button id="nav-bank" onclick="tocarSomBotao(); openTab('bank')">BANCO</button>
+        <button id="nav-support" onclick="tocarSomBotao(); openTab('support')">SUPORTE</button>
+    </nav>
+
+    <main>
+        <div id="play" class="tab-content active">
+            <div class="section-header">
+                <div>
+                    <h2 class="casino-font">Arena de Apostas</h2>
+                    <p>Analisando tendências de mercado em tempo real.</p>
+                </div>
+                <button class="info-trigger-btn" onclick="tocarSomBotao(); openInstructions()">!</button>
+            </div>
+
+            <div class="balance-card">
+                <span class="balance-label">SALDO DE BÔNUS</span>
+                <span id="mainBalance" class="balance-amount">R$ 30,00</span>
+            </div>
+
+            <div class="wheel-outer">
+                <div class="pointer"></div>
+                <div class="wheel-container">
+                    <div id="wheel-wrapper" class="idle-anim">
+                        <div class="wheel-img"></div>
+                        <div class="wheel-center"><span class="casino-font">7</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="color-buttons">
+                <button class="color-btn btn-black" onclick="tocarSomBotao(); selColor('preto', this)">ÔNIX ABSOLUTO</button>
+                <button class="color-btn btn-red" onclick="tocarSomBotao(); selColor('vermelho', this)">OURO IMPERIAL</button>
+            </div>
+
+            <div class="bet-controls">
+                <div style="display: flex; justify-content: center; gap: 10px; align-items: center;">
+                    <input type="number" id="betInput" class="bet-input" value="10">
+                    <div style="display: flex; gap: 5px;">
+                        <button class="m-btn active" onclick="tocarSomBotao(); setM(1, this)">1x</button>
+                        <button class="m-btn" onclick="tocarSomBotao(); setM(2, this)">2x</button>
+                        <button class="m-btn" onclick="tocarSomBotao(); setM(3, this)">3x</button>
+                    </div>
+                </div>
+                <p id="status" style="font-size: 0.6rem; color: #444; margin-top: 10px; letter-spacing: 2px; font-weight: 800;">AGUARDANDO DEFINIÇÃO</p>
+            </div>
+
+            <button id="spinBtn" class="spin-master" onclick="playGame()" disabled>INICIAR OPERAÇÃO</button>
+
+            <!-- AJUSTE NO RODAPÉ DA ROLETA -->
+            <div class="stats-grid">
+                <div class="stat-item"><b>Sequência</b><span id="streak">0</span></div>
+                <div class="stat-item"><b>Lucro Anterior</b><span id="lastWin">R$ 0,00</span></div>
+                <div class="stat-item"><b>Algoritmo</b><span style="color:var(--neon-green)">Estável</span></div>
+            </div>
+        </div>
+
+        <!-- ABA DE BÔNUS SEMANAL -->
+        <div id="bonus" class="tab-content">
+            <div class="section-header">
+                <h2 class="casino-font">Recompensas</h2>
+                <p>Resgate seus bônus exclusivos uma vez por semana.</p>
+            </div>
+
+            <div class="support-card" style="margin-top: 15px; padding: 18px 20px;">
+                <div class="support-info-title" style="font-size: 0.7rem; margin-bottom: 5px;">CRONOGRAMA DE RECOMPENSAS</div>
+                <p style="font-size: 0.68rem; color: #aaa; line-height: 1.5; margin-bottom: 0;">Aumente seu power de alavancagem na arena liberando fundos semanais de recompensa ativa.</p>
+            </div>
+
+            <div class="bonus-grid">
+                <div class="bonus-card-item available" id="bonus-d1">
+                    <div class="bonus-day">Semana 1</div>
+                    <div class="bonus-val">R$ 5,00</div>
+                    <button class="bonus-btn" onclick="claimBonus(1, 5.00, this)">Coletar</button>
+                </div>
+                <div class="bonus-card-item" id="bonus-d2">
+                    <div class="bonus-day">Semana 2</div>
+                    <div class="bonus-val">R$ 10,00</div>
+                    <button class="bonus-btn" onclick="claimBonus(2, 10.00, this)" disabled>Coletar</button>
+                </div>
+                <div class="bonus-card-item" id="bonus-d3">
+                    <div class="bonus-day">Semana 3</div>
+                    <div class="bonus-val">R$ 15,00</div>
+                    <button class="bonus-btn" onclick="claimBonus(3, 15.00, this)" disabled>Coletar</button>
+                </div>
+                <div class="bonus-card-item" id="bonus-d4">
+                    <div class="bonus-day">Semana 4</div>
+                    <div class="bonus-val">R$ 30,00</div>
+                    <button class="bonus-btn" onclick="claimBonus(4, 30.00, this)" disabled>Coletar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="bank" class="tab-content">
+            <div class="section-header">
+                <h2 class="casino-font">Gestão de Capital</h2>
+                <p>Transferências de alto nível com liquidação instantânea.</p>
+            </div>
+            
+            <div class="balance-card" style="margin-top: 15px;">
+                <span class="balance-label">DISPONÍVEL PARA RETIRADA</span>
+                <span id="bankBalance" class="balance-amount">R$ 30,00</span>
+            </div>
+
+            <div style="text-align: left; margin: 15px 0 20px 0;">
+                <p style="font-size: 0.75rem; font-weight: 800; color: var(--gold); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;">POLÍTICA DE LIQUIDAÇÃO VIP</p>
+                <p style="font-size: 0.65rem; color: #aaa; line-height: 1.4;">Suas movimentações financeiras passam por canais de criptografia integrada de ponta a ponta. Os aportes operam com auditoria e liberação de margem, enquanto as ordens de saque direcionadas para contas contam com processamento rígido.</p>
+                <p style="font-size: 0.6rem; color: var(--gold-glow); font-weight: 700; margin-top: 10px; border-left: 2px solid var(--gold); padding-left: 8px;">NOTA: Para desbloquear saques e resgates de recompensas nesta conta, é necessário realizar um depósito mínimo de verificação de R$ 45,00.</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <button onclick="tocarSomBotao(); openBank('deposit')" style="padding:15px; border-radius:12px; background:rgba(0,255,136,0.05); border:1px solid var(--neon-green); color:#fff; font-weight:900; font-size: 0.7rem;">DEPOSITAR</button>
+                <button onclick="tocarSomBotao(); openBank('withdraw')" style="padding:15px; border-radius:12px; background:rgba(179,0,0,0.05); border:1px solid var(--red-casino); color:#fff; font-weight:900; font-size: 0.7rem;">SACAR</button>
+            </div>
+            <p style="text-align: left; font-size: 0.6rem; color: #666; font-weight: 900; letter-spacing: 1px;">RELATÓRIO DE ATIVIDADES</p>
+            <div id="notifList" class="notif-list"><div style="color: #555; padding: 15px 10px; text-align: center; font-weight: 600;">Sem movimentações registradas hoje.</div></div>
+        </div>
+
+        <!-- ABA SUPORTE AJUSTADA E EM EMBLEMA PREMIUM -->
+        <div id="support" class="tab-content">
+            <div class="section-header">
+                <h2 class="casino-font">Concierge VIP</h2>
+                <p>Suporte prioritário e exclusivo disponível 24 horas por dia.</p>
+            </div>
+            
+            <div class="support-card">
+                <div class="support-info-title casino-font">ATENDIMENTO HIGH STAKES</div>
+                <div class="support-info-text">Como membro da nossa arena premium, você dispõe de canais diretos de intermediação para a resolução imediata de dúvidas operacionais, validação estrutural de conta ou auditoria de saques.</div>
+                
+                <div class="support-contact-box">
+                    <span class="support-contact-label">SUPORTE VIA E-MAIL OFICIAL</span>
+                    <span class="support-contact-value">suportejogadores@gmail.com</span>
+                </div>
+                
+                <div class="support-info-text" style="font-size: 0.62rem; color: #666; margin-bottom: 0;">Tempo de resposta estimado para a categoria Black Diamond: <span style="color: var(--gold-glow); font-weight: 700;">Imediato</span>.</div>
+            </div>
+
+            <button onclick="tocarSomBotao(); window.location.href='mailto:suportejogadores@gmail.com'" style="width:100%; padding:15px; background:var(--gold-linear); color:#000; border:none; border-radius:50px; font-weight:900; margin-top:25px; box-shadow: 0 5px 15px rgba(212, 175, 55, 0.2); text-transform: uppercase; letter-spacing: 1px; cursor: pointer;">SUPORTE VIA E-MAIL</button>
+        </div>
+    </main>
+</div>
+
+<script>
+    // --- SISTEMA DE ÁUDIO SUAVE PREMIUM (WEB AUDIO API) ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playTone(frequency, type, duration, volume) {
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = type;
+        oscillator.frequency.value = frequency;
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(volume, audioCtx.currentTime + 0.02);
+        gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + duration);
+    }
+
+    function tocarSomEntrada() {
+        playTone(329.63, 'sine', 1.2, 0.04);
+        setTimeout(() => playTone(493.88, 'sine', 1.0, 0.02), 150);
+        document.removeEventListener('click', tocarSomEntrada);
+        document.removeEventListener('touchstart', tocarSomEntrada);
+    }
+    document.addEventListener('click', tocarSomEntrada);
+    document.addEventListener('touchstart', tocarSomEntrada);
+
+    function tocarSomBotao() {
+        playTone(550, 'sine', 0.08, 0.05);
+    }
+
+    function tocarSomFinalVitoria() {
+        playTone(261.63, 'sine', 0.3, 0.04);
+        setTimeout(() => playTone(329.63, 'sine', 0.4, 0.04), 100);
+    }
+    // -------------------------------------------------------------------------------------
+
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function initCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    class Particle {
+        constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 2 + 1; this.speedX = Math.random() * 1 - 0.5; this.speedY = Math.random() * 1 - 0.5; }
+        update() { this.x += this.speedX; this.y += this.speedY; if (this.x > canvas.width) this.x = 0; if (this.x < 0) this.x = canvas.width; if (this.y > canvas.height) this.y = 0; if (this.y < 0) this.y = canvas.height; }
+        draw() { ctx.fillStyle = 'rgba(212, 175, 55, 0.4)'; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+    }
+    function createParticles() { for (let i = 0; i < 60; i++) { particles.push(new Particle()); } }
+    function animateBg() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); for (let j = i; j < particles.length; j++) { const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const distance = Math.sqrt(dx * dx + dy * dy); if (distance < 150) { ctx.strokeStyle = `rgba(212, 175, 55, ${0.8 - distance/150})`; ctx.lineWidth = 0.5; ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke(); } } } requestAnimationFrame(animateBg); }
+    window.addEventListener('resize', initCanvas); initCanvas(); createParticles(); animateBg();
+
+    let usuarioCadastrado = null;
+    
+    function sincronizarBancoLocal() {
+        localStorage.setItem('arena_balance', balance);
+        localStorage.setItem('arena_has_deposited', hasDeposited);
+        localStorage.setItem('arena_claimed_bonuses', JSON.stringify(claimedBonuses));
+        localStorage.setItem('arena_history_html', document.getElementById('notifList').innerHTML);
+    }
+
+    function carregarBancoLocal() {
+        const contaSalva = localStorage.getItem('arena_user_account');
+        if (contaSalva) {
+            usuarioCadastrado = JSON.parse(contaSalva);
+            document.getElementById('profileName').value = usuarioCadastrado.nome;
+            document.getElementById('loginEmail').value = usuarioCadastrado.email;
+        }
+
+        if (localStorage.getItem('arena_balance') !== null) {
+            balance = parseFloat(localStorage.getItem('arena_balance'));
+            displayedBalance = balance;
+        }
+
+        if (localStorage.getItem('arena_has_deposited') !== null) {
+            hasDeposited = localStorage.getItem('arena_has_deposited') === 'true';
+        }
+
+        if (localStorage.getItem('arena_claimed_bonuses') !== null) {
+            claimedBonuses = JSON.parse(localStorage.getItem('arena_claimed_bonuses'));
+            
+            claimedBonuses.forEach(week => {
+                const card = document.getElementById(`bonus-d${week}`);
+                if (card) {
+                    const btn = card.querySelector('.bonus-btn');
+                    btn.innerText = "Coletado";
+                    btn.disabled = true;
+                    card.classList.remove('available');
+                    
+                    const nextCard = document.getElementById(`bonus-d${week + 1}`);
+                    if (nextCard) {
+                        nextCard.classList.add('available');
+                        nextCard.querySelector('button').disabled = false;
+                    }
+                }
+            });
+        }
+
+        if (localStorage.getItem('arena_history_html') !== null) {
+            document.getElementById('notifList').innerHTML = localStorage.getItem('arena_history_html');
+        }
+    }
+
+    function switchAuth(type) {
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+        if(type === 'login') { document.querySelectorAll('.auth-tab')[0].classList.add('active'); document.getElementById('loginForm').classList.add('active'); }
+        else { document.querySelectorAll('.auth-tab')[1].classList.add('active'); document.getElementById('registerForm').classList.add('active'); }
+    }
+
+    function showAuthToast(title, desc, isSuccess = false) {
+        const toast = document.getElementById('auth-toast');
+        const titleEl = document.getElementById('auth-toast-title');
+        const descEl = document.getElementById('auth-toast-desc');
+        
+        toast.style.border = isSuccess ? '1px solid var(--neon-green)' : '1px solid var(--red-casino)';
+        titleEl.style.color = isSuccess ? 'var(--neon-green)' : 'var(--red-casino)';
+        
+        titleEl.innerText = title;
+        descEl.innerText = desc;
+        
+        toast.classList.add('active');
+        setTimeout(() => {
+            toast.classList.remove('active');
+        }, 4000);
+    }
+
+    function realizarCadastro(e) {
+        e.preventDefault();
+        const nome = document.getElementById('regName').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const senha = document.getElementById('regPassword').value;
+
+        const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        if (!gmailRegex.test(email)) {
+            showAuthToast("ERRO DE CADASTRO", "Por favor, insira um e-mail válido da Google (@gmail.com).", false);
+            return;
+        }
+
+        if (senha.length < 6) {
+            showAuthToast("ERRO DE CADASTRO", "A senha deve conter no mínimo 6 dígitos.", false);
+            return;
+        }
+
+        usuarioCadastrado = { nome, email, senha };
+        document.getElementById('profileName').value = nome;
+        
+        localStorage.setItem('arena_user_account', JSON.stringify(usuarioCadastrado));
+
+        showAuthToast("CADASTRO REALIZADO!", "A conta foi criada. Prossiga efetuando o seu login.", true);
+        setTimeout(() => {
+            switchAuth('login');
+            document.getElementById('loginEmail').value = email;
+        }, 1500);
+    }
+
+    function realizarLogin(e) {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value.trim();
+        const senha = document.getElementById('loginPassword').value;
+
+        if (!usuarioCadastrado) {
+            showAuthToast("ACESSO NEGADO", "Nenhuma conta registrada. Por favor, realize o Cadastro primeiro.", false);
+            return;
+        }
+
+        if (email !== usuarioCadastrado.email || senha !== usuarioCadastrado.senha) {
+            showAuthToast("ACESSO NEGADO", "E-mail ou Senha incorretos na verificação de chaves.", false);
+            return;
+        }
+
+        const btn = e.target.querySelector('button'); btn.innerText = "VERIFICANDO CREDENCIAIS..."; btn.disabled = true;
+        setTimeout(() => {
+            document.getElementById('auth-screen').style.opacity = '0';
+            setTimeout(() => { 
+                document.getElementById('auth-screen').style.display = 'none'; 
+                document.getElementById('main-content').style.display = 'block'; 
+                showToast("CONEXÃO ESTABELECIDA COM A ARENA VIP!"); 
+                initCanvas(); 
+            }, 800);
+        }, 1500);
+    }
+
+    let balance = 30.00; 
+    let displayedBalance = 30.00;
+    let hasDeposited = false; 
+    let claimedBonuses = []; 
+
+    let selC = null;
+    let mult = 1;
+    let isSpinning = false;
+    let curRot = 0;
+    let curAction = '';
+    let currentStreak = 0;
+
+    function openInstructions() { document.getElementById('instructions-modal').style.display = 'flex'; }
+    function closeInstructions() { document.getElementById('instructions-modal').style.display = 'none'; }
+
+    function showToast(msg, type='success') {
+        const c = document.getElementById('toast-container');
+        const t = document.createElement('div');
+        t.className = `toast`; t.style.borderLeft = `5px solid ${type==='success'?'#00ff88':'#b30000'}`;
+        t.innerHTML = `<span style="font-size:0.75rem; font-weight:700;">${msg}</span>`;
+        c.appendChild(t);
+        setTimeout(() => { t.style.opacity = '0'; setTimeout(()=>t.remove(),500); }, 3000);
+    }
+
+    function updateUI() {
+        const diff = balance - displayedBalance;
+        const steps = 40;
+        const increment = diff / steps;
+        let currentStep = 0;
+        const timer = setInterval(() => {
+            displayedBalance += increment;
+            currentStep++;
+            const formatted = displayedBalance.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+            document.getElementById('mainBalance').innerText = formatted;
+            document.getElementById('bankBalance').innerText = formatted;
+            if (currentStep >= steps) {
+                displayedBalance = balance;
+                const finalFormatted = balance.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+                document.getElementById('mainBalance').innerText = finalFormatted;
+                document.getElementById('bankBalance').innerText = finalFormatted;
+                clearInterval(timer);
+                
+                sincronizarBancoLocal();
+            }
+        }, 20);
+    }
+
+    function openTab(id) {
+        document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+        document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.getElementById('nav-'+id).classList.add('active');
+    }
+
+    function selColor(c, b) {
+        if(isSpinning) return;
+        selC = c;
+        document.querySelectorAll('.color-btn').forEach(x=>x.classList.remove('selected'));
+        b.classList.add('selected');
+        document.getElementById('spinBtn').disabled = false;
+        document.getElementById('status').innerText = `POSIÇÃO ADQUIRIDA EM: ${c === 'preto' ? 'ÔNIX ABSOLUTO' : 'OURO IMPERIAL'}`;
+    }
+
+    function setM(m, b) { mult = m; document.querySelectorAll('.m-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); }
+
+    function playGame() {
+        const base = parseFloat(document.getElementById('betInput').value);
+        const cost = base * mult;
+        if(balance < cost) { showToast("SALDO INSUFICIENTE PARA ESSA OPERAÇÃO", "error"); return; }
+        if (isSpinning) return;
+
+        tocarSomBotao();
+
+        isSpinning = true;
+        balance -= cost;
+        updateUI();
+        
+        const wrap = document.getElementById('wheel-wrapper');
+        const btn = document.getElementById('spinBtn');
+        const outer = document.querySelector('.wheel-outer');
+        
+        wrap.classList.remove('idle-anim');
+        btn.disabled = true;
+        document.getElementById('status').innerText = "PROCESSANDO ALGORITMO...";
+
+        const style = window.getComputedStyle(wrap);
+        const matrix = new WebKitCSSMatrix(style.transform);
+        const currentAngle = Math.round(Math.atan2(matrix.b, matrix.a) * (180 / Math.PI));
+        wrap.style.transform = `rotate(${currentAngle}deg)`;
+        
+        const randomExtra = Math.floor(Math.random() * 360);
+        curRot += (3600 + randomExtra); 
+        
+        setTimeout(() => {
+            wrap.style.transform = `rotate(${curRot}deg)`;
+        }, 50);
+        
+        setTimeout(() => {
+            tocarSomFinalVitoria(); 
+            
+            const finalAngle = curRot % 360;
+            const normalizedAngle = (360 - finalAngle) % 360;
+            const sliceIndex = Math.floor(normalizedAngle / 18);
+            const landed = (sliceIndex % 2 === 0) ? 'preto' : 'vermelho';
+            
+            if(landed === selC) {
+                const win = (base * 2) * mult;
+                balance += win;
+                
+                currentStreak++;
+                document.getElementById('streak').innerText = currentStreak;
+
+                document.getElementById('win-amt-display').innerText = win.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+                
+                const winOverlay = document.getElementById('win-overlay');
+                winOverlay.classList.add('active');
+                setTimeout(() => {
+                    winOverlay.classList.remove('active');
+                }, 4000);
+                
+                outer.style.transform = 'scale(1.05)';
+                setTimeout(() => outer.style.transform = 'scale(1)', 300);
+                addH('Vitória Arena', win);
+                document.getElementById('lastWin').innerText = `R$ ${win.toFixed(2)}`;
+                document.getElementById('status').innerText = "OPERAÇÃO CONCLUÍDA COM LUCRO!";
+            } else {
+                currentStreak = 0;
+                document.getElementById('streak').innerText = currentStreak;
+                
+                const resultadoTexto = landed === 'preto' ? 'ÔNIX ABSOLUTO' : 'OURO IMPERIAL';
+                showToast(`RESULTADO: ${resultadoTexto} - OPERAÇÃO FRACASSADA`, "error");
+                document.getElementById('status').innerText = "TENTATIVA FRACASSADA. AJUSTE SUA ESTRATÉGIA.";
+            }
+            
+            updateUI();
+            isSpinning = false;
+            btn.disabled = false;
+            
+            setTimeout(() => {
+                if(!isSpinning) wrap.classList.add('idle-anim');
+            }, 100);
+            
+        }, 8100); 
+    }
+
+    function addH(t, amt) {
+        const l = document.getElementById('notifList');
+        if(l.innerText.includes("Sem movimentações")) l.innerHTML = "";
+        const i = document.createElement('div');
+        i.className = 'notif-item';
+        i.innerHTML = `<span>${t}</span><b style="color:${amt>0?'#00ff88':'#ff4444'}">R$ ${Math.abs(amt).toFixed(2)}</b>`;
+        l.prepend(i);
+        sincronizarBancoLocal(); 
+    }
+
+    function openProfileModal() { document.getElementById('profile-modal').style.display = 'flex'; }
+    function closeProfileModal() { 
+        document.getElementById('profile-modal').style.display = 'none'; 
+        if(usuarioCadastrado) {
+            usuarioCadastrado.nome = document.getElementById('profileName').value.trim();
+            localStorage.setItem('arena_user_account', JSON.stringify(usuarioCadastrado));
+        }
+    }
+
+    function openBank(type) {
+        curAction = type;
+        document.getElementById('bank-modal').style.display = 'flex';
+        document.getElementById('modal-form-area').style.display = 'block';
+        document.getElementById('pix-area').style.display = 'none';
+        const info = document.getElementById('limit-info');
+        if(type === 'deposit') {
+            document.getElementById('modal-title').innerText = "APORTAR DEPÓSITO";
+            document.getElementById('modal-desc').innerText = "Efetue um depósito via PIX para ativação e sincronização da sua conta.";
+            document.getElementById('withdraw-fields').style.display = 'none';
+            info.innerText = "Recomendado para verificação: R$ 45,00";
+        } else {
+            document.getElementById('modal-title').innerText = "SOLICITAR RETIRADA";
+            document.getElementById('modal-desc').innerText = "Liquidação instantânea via PIX para contas homologadas.";
+            document.getElementById('withdraw-fields').style.display = 'block';
+            info.innerText = "Limites: Min R$ 100,00 | Max R$ 900,00";
+        }
+    }
+
+    function confirmBank() {
+        tocarSomBotao();
+        const val = parseFloat(document.getElementById('modal-input').value);
+        if(!val) return;
+        if(curAction === 'deposit') {
+            if(val === 45.00) {
+                hasDeposited = true;
+            }
+            document.getElementById('modal-form-area').style.display = 'none';
+            document.getElementById('pix-area').style.display = 'block';
+            document.getElementById('pix-val').innerText = `R$ ${val.toFixed(2)}`;
+            addH('Depósito Gerado', val);
+        } else {
+            if(!hasDeposited) {
+                showToast("SAQUE BLOCKADO: É necessário efetuar o depósito de ativação de R$ 45,00 para liberar retiradas.", "error");
+                closeBankModal();
+                return;
+            }
+            if(val < 100 || val > 900) { showToast("VALOR SOLICITADO FORA DOS LIMITES PERMITIDOS", "error"); return; }
+            if(val > balance) { showToast("SALDO DISPONÍVEL INSUFICIENTE", "error"); return; }
+            balance -= val; updateUI(); addH('Saque PIX', -val); closeBankModal(); showToast("ORDEM DE RETIRADA ENVIADA PARA PROCESSAMENTO!");
+        }
+    }
+
+    document.getElementById('modal-confirm').onclick = confirmBank;
+
+    function closeBankModal() { document.getElementById('bank-modal').style.display = 'none'; }
+    function copyPix() { navigator.clipboard.writeText(document.getElementById('pix-code').innerText); showToast("CÓDIGO COPIADO COM SUCESSO!"); }
+    function selPix(t, b) { document.querySelectorAll('.pix-option').forEach(x=>x.classList.remove('active')); b.classList.add('active'); }
+
+    function claimBonus(week, amount, element) {
+        tocarSomBotao();
+        if (claimedBonuses.includes(week)) {
+            showToast("BÔNUS JÁ RESGATADO NESTA CONTA!", "error");
+            return;
+        }
+
+        if (!hasDeposited) {
+            showToast("ACESSO NEGADO: Realize um depósito na plataforma para liberar o resgate de bônus.", "error");
+            return;
+        }
+
+        balance += amount;
+        claimedBonuses.push(week);
+        updateUI();
+        addH(`Bônus Semana ${week}`, amount);
+        showToast(`BÔNUS DA SEMANA ${week} COLETADO COM SUCESSO: +R$ ${amount.toFixed(2)}`);
+
+        element.innerText = "Coletado";
+        element.disabled = true;
+        element.parentElement.classList.remove('available');
+
+        const nextWeekId = `bonus-d${week + 1}`;
+        const nextWeekEl = document.getElementById(nextWeekId);
+        if (nextWeekEl) {
+            nextWeekEl.classList.add('available');
+            nextWeekEl.querySelector('button').disabled = false;
+        }
+    }
+
+    carregarBancoLocal();
+    updateUI();
+</script>
+</body>
+</html>
+
